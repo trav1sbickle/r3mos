@@ -1,2 +1,0 @@
-abrir terminal nueva y ejecutar:
-curl -X POST http://localhost:5000/api/simular
