@@ -18,6 +18,9 @@ function App() {
   const [datos, setDatos] = useState({ ingresos: [], gastos: [] });
   const [formIngreso, setFormIngreso] = useState({ monto: '', fecha: '', categoria: '' });
   const [formGasto, setFormGasto] = useState({ monto: '', fecha: '', categoria: '' });
+  const [prediccion, setPrediccion] = useState(null);
+  const [errorPrediccion, setErrorPrediccion] = useState(null);
+  const [cargandoPrediccion, setCargandoPrediccion] = useState(false);
 
   const categorias = ['Salario', 'Freelance', 'Alimentos', 'Transporte', 'Ocio', 'Otros'];
 
@@ -31,6 +34,67 @@ function App() {
       .then(data => setDatos(data))
       .catch(err => console.error("fetchDatos error:", err));
   };
+
+// Actualiza la función fetchPrediccion
+// Actualiza la función fetchPrediccion
+const fetchPrediccion = () => {
+  setCargandoPrediccion(true);
+  setErrorPrediccion(null);
+  
+  fetch(`http://127.0.0.1:5000/api/prediccion/${usuario}`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Error en la respuesta del servidor');
+      }
+      return response.json();
+    })
+    .then(data => {
+  if (data && typeof data.prediccion !== 'undefined') {
+    setPrediccion({
+      monto: Number(data.prediccion),
+      meses: data.meses_analizados || 'varios'
+    });
+  } else {
+    throw new Error('Formato de respuesta inesperado');
+  }
+})
+    .catch(error => {
+      console.error('Error fetching prediction:', error);
+      setErrorPrediccion(error.message || 'Error al obtener la predicción');
+    })
+    .finally(() => {
+      setCargandoPrediccion(false);
+    });
+};
+
+// Actualiza la visualización
+{prediccion && (
+  <div className="prediction-result">
+    <div className="prediction-amount">
+      ${prediccion.monto.toLocaleString('es-AR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      })}
+      <span className="currency">ARS</span>
+    </div>
+    <div className="prediction-details">
+      <p>Estimación basada en tus últimos {prediccion.meses || 'varios'} meses de gastos</p>
+      <small>La predicción usa regresión lineal sobre tus datos históricos</small>
+    </div>
+  </div>
+)}
+
+
+
+
+
+
+
+
+
+
+
+
 
   const handleAuth = (tipo) => {
     if (!auth.nombre || !auth.password) {
@@ -178,6 +242,49 @@ function App() {
           </LineChart>
         </ResponsiveContainer>
       </section>
+
+<section className="prediction-section">
+  <h2>🔮 Predicción de Gastos</h2>
+  <div className="prediction-controls">
+    <button 
+      onClick={fetchPrediccion}
+      disabled={cargandoPrediccion}
+      className={`prediction-button ${cargandoPrediccion ? 'loading' : ''}`}
+    >
+      {cargandoPrediccion ? (
+        <>
+          <span className="spinner"></span>
+          Calculando...
+        </>
+      ) : (
+        'Predecir gastos del próximo mes'
+      )}
+    </button>
+    
+    {errorPrediccion && (
+      <div className="prediction-error">
+        <span>⚠️</span> {errorPrediccion}
+      </div>
+    )}
+  </div>
+
+  {prediccion && (
+    <div className="prediction-result">
+      <div className="prediction-amount">
+        ${prediccion.monto.toLocaleString('es-AR', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        })}
+        <span className="currency">ARS</span>
+      </div>
+      <div className="prediction-details">
+        <p>Estimación basada en tus últimos {prediccion.meses || 'varios'} meses de gastos</p>
+        <small>La predicción usa regresión lineal sobre tus datos históricos</small>
+      </div>
+    </div>
+  )}
+</section>
+
     </div>
   );
 }
