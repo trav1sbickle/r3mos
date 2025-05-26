@@ -1,13 +1,155 @@
+/* App.css */
+
+/* Fondo general */
 body {
+  background-color: #f2f9fd;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  padding: 0;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+/* Contenedor del login */
+.auth-container {
+  background-color: #d2f0fd;
+  max-width: 400px;
+  margin: 5% auto;
+  padding: 40px 30px;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+/* Título */
+.auth-container h2 {
+  color: #2c3e50;
+  margin-bottom: 25px;
+}
+
+/* Inputs */
+.auth-container input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  box-sizing: border-box;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* Botones */
+.auth-container button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  background-color: #66c3ff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.auth-container button:hover {
+  background-color: #4eb2f1;
+}
+
+
+.app {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+}
+
+#TituloPrincipal {
+  text-align: center;
+  color: #007acc;
+}
+
+section {
+  margin-top: 30px;
+  background-color: #ffffff;
+  padding: 15px;
+  border-radius: 15px;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.05);
+}
+
+.form-group {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+input, select {
+  padding: 10px;
+  width: 30%;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: #fefefe;
+}
+
+button.btn-primary,
+button.btn-danger {
+  padding: 10px 20px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-weight: 500;
+  background-color: transparent;
+  transition: all 0.3s ease;
+}
+
+/* Botón primario (Ingreso) */
+button.btn-primary {
+  color: #0077b6;
+  border-color: #0077b6;
+  margin: 0 25% 0 25% ;
+  width: 100%;
+}
+
+button.btn-primary:hover {
+  background-color: #d0f0ff;
+}
+
+/* Botón de acción peligrosa (Gasto) */
+button.btn-danger {
+  color: #0077b6;
+  border-color: #0077b6;
+  margin: 0 25% 0 25% ;
+  width: 100%;
+}
+
+button.btn-danger:hover {
+  background-color: #d0f0ff;
+}
+
+/* Botón ícono (eliminar) */
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+/* Tabla */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+th {
+  background-color: #d0f0ff;
+  font-weight: 600;
+}
+
+.tabla-scroll {
+  max-height: 250px;
+  overflow-y: auto;
 }
