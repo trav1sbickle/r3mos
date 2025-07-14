@@ -245,7 +245,7 @@ def entrenar_modelo(gastos_por_mes):
     gastos_por_mes['mes_num'] = np.arange(len(gastos_por_mes))
 
     X = gastos_por_mes[['mes_num']]
-    y = gastos_por_mes['monto']
+    y = gastos_por_mes['monto'] 
 
     modelo = LinearRegression()
     modelo.fit(X, y)
@@ -280,6 +280,60 @@ def obtener_prediccion(usuario_id):
             "error": str(e),
             "status": "error"
         }), 500
+@app.route('/api/cargar_csv', methods=['POST'])
+def cargar_csv():
+    file = request.files.get('file')
+    usuario_id = request.form.get('usuario_id')
+
+    if not file or not usuario_id:
+        return jsonify({"error": "Archivo o ID de usuario faltante"}), 400
+
+    try:
+        df = pd.read_csv(file)
+        # Requiere columnas: monto, fecha, categoria
+        if not all(col in df.columns for col in ['monto', 'fecha', 'categoria']):
+            return jsonify({"error": "Faltan columnas necesarias"}), 400
+
+        conn = conectar_db()
+        c = conn.cursor()
+
+        for _, row in df.iterrows():
+            c.execute("INSERT INTO gastos (monto, fecha, categoria, usuario_id) VALUES (?, ?, ?, ?)",
+                      (row['monto'], row['fecha'], row['categoria'], usuario_id))
+
+        conn.commit()
+        conn.close()
+
+        return jsonify({"mensaje": "Archivo CSV cargado con éxito"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+@app.route('/api/cargar_csv_ingresos', methods=['POST'])
+def cargar_csv_ingresos():
+    file = request.files.get('file')
+    usuario_id = request.form.get('usuario_id')
+
+    if not file or not usuario_id:
+        return jsonify({"error": "Archivo o ID de usuario faltante"}), 400
+
+    try:
+        df = pd.read_csv(file)
+        # Requiere columnas: monto, fecha, categoria
+        if not all(col in df.columns for col in ['monto', 'fecha', 'categoria']):
+            return jsonify({"error": "Faltan columnas necesarias"}), 400
+
+        conn = conectar_db()
+        c = conn.cursor()
+
+        for _, row in df.iterrows():
+            c.execute("INSERT INTO ingresos (monto, fecha, categoria, usuario_id) VALUES (?, ?, ?, ?)",
+                      (row['monto'], row['fecha'], row['categoria'], usuario_id))
+
+        conn.commit()
+        conn.close()
+
+        return jsonify({"mensaje": "Ingresos cargados con éxito"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 
