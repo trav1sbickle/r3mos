@@ -1,4 +1,8 @@
+
 // frontend/src/App.js
+
+
+
 import React, { useEffect, useState } from 'react';
 import './App.css';
 import {
@@ -13,6 +17,7 @@ import {
 } from 'recharts';
 
 function App() {
+  const [vista, setVista] = useState(null); // 'ingresos', 'gastos' o null
   const [usuario, setUsuario] = useState(null);
   const [auth, setAuth] = useState({ nombre: '', password: '' });
   const [datos, setDatos] = useState({ ingresos: [], gastos: [] });
@@ -86,6 +91,25 @@ const fetchPrediccion = () => {
 
 
 
+const renderUltimos = (tipo) => {
+  const ultimos = [...datos[tipo]].slice(-3);
+  return (
+    <table>
+      <thead>
+        <tr><th>Fecha</th><th>Monto</th><th>Categoría</th></tr>
+      </thead>
+      <tbody>
+        {ultimos.map(item => (
+          <tr key={item.id}>
+            <td>{item.fecha}</td>
+            <td>{item.monto}</td>
+            <td>{item.categoria}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+};
 
 
 
@@ -195,6 +219,62 @@ const fetchPrediccion = () => {
   return (
     <div className="app">
       <h1>Dashboard Financiero</h1>
+      <section>
+  <h2>Cargar gastos por CSV</h2>
+  <form
+    onSubmit={(e) => {
+      e.preventDefault();
+      const formData = new FormData();
+      formData.append('file', e.target.csvFile.files[0]);
+      formData.append('usuario_id', usuario);
+
+      fetch('http://127.0.0.1:5000/api/cargar_csv', {
+        method: 'POST',
+        body: formData
+      })
+        .then(res => res.json())
+        .then(data => {
+          alert(data.mensaje || data.error);
+          fetchDatos(usuario);
+        })
+        .catch(err => {
+          console.error("Error al cargar CSV:", err);
+          alert("Ocurrió un error al cargar el archivo");
+        });
+    }}
+  >
+    <input type="file" name="csvFile" accept=".csv" required />
+    <button type="submit">Subir archivo</button>
+  </form>
+</section>
+<section>
+  <h2>Cargar ingresos por CSV</h2>
+  <form
+    onSubmit={(e) => {
+      e.preventDefault();
+      const formData = new FormData();
+      formData.append('file', e.target.csvFile.files[0]);
+      formData.append('usuario_id', usuario);
+
+      fetch('http://127.0.0.1:5000/api/cargar_csv_ingresos', {
+        method: 'POST',
+        body: formData
+      })
+        .then(res => res.json())
+        .then(data => {
+          alert(data.mensaje || data.error);
+          fetchDatos(usuario);
+        })
+        .catch(err => {
+          console.error("Error al cargar ingresos CSV:", err);
+          alert("Error al cargar el archivo");
+        });
+    }}
+  >
+    <input type="file" name="csvFile" accept=".csv" required />
+    <button type="submit">Subir archivo</button>
+  </form>
+</section>
 
       <section>
         <h3>Agregar Ingreso</h3>
@@ -218,15 +298,31 @@ const fetchPrediccion = () => {
         <button onClick={() => handleSubmit('gasto', formGasto)}>Agregar Gasto</button>
       </section>
 
-      <section>
-        <h2>Ingresos</h2>
-        {renderTabla('ingresos')}
-      </section>
+      {!vista && (
+  <>
+    <section>
+      <h2>Últimos Ingresos</h2>
+      {renderUltimos('ingresos')}
+      <button onClick={() => setVista('ingresos')}>Ver todos</button>
+    </section>
 
-      <section>
-        <h2>Gastos</h2>
-        {renderTabla('gastos')}
-      </section>
+    <section>
+      <h2>Últimos Gastos</h2>
+      {renderUltimos('gastos')}
+      <button onClick={() => setVista('gastos')}>Ver todos</button>
+    </section>
+  </>
+)}
+
+{vista && (
+  <section>
+    <button onClick={() => setVista(null)}>⬅ Volver</button>
+    <h2>Todos los {vista}</h2>
+    {renderTabla(vista)}
+  </section>
+)}
+
+
 
       <section>
         <h2>Gráfico</h2>
@@ -242,6 +338,7 @@ const fetchPrediccion = () => {
           </LineChart>
         </ResponsiveContainer>
       </section>
+
 
 <section className="prediction-section">
   <h2>🔮 Predicción de Gastos</h2>
